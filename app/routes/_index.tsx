@@ -1,4 +1,9 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import {
+  type MetaFunction,
+  type LoaderFunctionArgs,
+  json,
+} from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,35 +12,19 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader({ context }: LoaderFunctionArgs) {
+  return json({
+    result: await context.env.DB.prepare("select * from Customers").first(),
+  });
+}
+
 export default function Index() {
+  const x = useLoaderData<typeof loader>();
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+      <pre>
+        <code>{JSON.stringify(x, null, 2)}</code>
+      </pre>
     </div>
   );
 }
