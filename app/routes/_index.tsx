@@ -14,7 +14,10 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ context }: LoaderFunctionArgs) {
   return json({
-    result: await context.env.DB.prepare("select * from Customers").first(),
+    result: await context.db
+      .selectFrom("Customers")
+      .selectAll()
+      .executeTakeFirst(),
   });
 }
 
